@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { QUICK_FOODS, searchQuickFoods, macrosForServing, type QuickFood } from "@/lib/quick-foods";
 
 interface ParsedItem {
   name: string;
@@ -599,6 +600,50 @@ function ManualPanel({ router }: { router: ReturnType<typeof useRouter> }) {
   const [fat, setFat] = React.useState("");
   const [mealType, setMealType] = React.useState<"breakfast" | "lunch" | "dinner" | "snack" | "other">("other");
   const [saving, setSaving] = React.useState(false);
+  const [showQuick, setShowQuick] = React.useState(false);
+  const quickFoodsRef = React.useRef<HTMLDivElement | null>(null);
+
+  const matchedQuickFoods = React.useMemo(() => {
+    return searchQuickFoods(name, 6);
+  }, [name]);
+
+  // Hide quick-foods list when clicking outside.
+  React.useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (quickFoodsRef.current && !quickFoodsRef.current.contains(e.target as Node)) {
+        setShowQuick(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  function applyQuickFood(food: QuickFood) {
+    const g = food.defaultServingG;
+    const m = macrosForServing(food, g);
+    setName(food.name);
+    setGrams(String(g));
+    setKcal(String(m.kcal));
+    setProtein(String(m.protein));
+    setCarbs(String(m.carbs));
+    setFat(String(m.fat));
+    setShowQuick(false);
+  }
+
+  // When grams change with a name that matches a quick food, recompute macros.
+  function recomputeFromGrams(newGrams: string) {
+    setGrams(newGrams);
+    const numG = Number(newGrams);
+    if (!Number.isFinite(numG) || numG <= 0) return;
+    const match = QUICK_FOODS.find((f) => f.name === name);
+    if (match) {
+      const m = macrosForServing(match, numG);
+      setKcal(String(m.kcal));
+      setProtein(String(m.protein));
+      setCarbs(String(m.carbs));
+      setFat(String(m.fat));
+    }
+  }
 
   async function onSave() {
     if (!name || !kcal) {
@@ -646,20 +691,52 @@ function ManualPanel({ router }: { router: ReturnType<typeof useRouter> }) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-5 p-6 sm:p-8">
-        <div className="flex flex-col gap-1.5">
+        <div className="relative flex flex-col gap-1.5" ref={quickFoodsRef}>
           <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Food name
           </label>
           <Input
-            placeholder="e.g. Brown rice (cooked)"
+            placeholder="e.g. Brown rice (cooked) — pick from list or type your own"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setShowQuick(true);
+            }}
+            onFocus={() => setShowQuick(true)}
             className="text-base"
           />
+          {showQuick && matchedQuickFoods.length > 0 && (
+            <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-auto rounded-2xl border border-border bg-popover shadow-lg">
+              {matchedQuickFoods.map((f) => {
+                const m = macrosForServing(f, f.defaultServingG);
+                return (
+                  <button
+                    key={f.name}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      applyQuickFood(f);
+                    }}
+                    className="flex w-full items-center justify-between gap-3 border-b border-border/40 px-4 py-2.5 text-left text-sm hover:bg-muted/40 last:border-b-0"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{f.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {f.servingLabel ?? `${f.defaultServingG}g`} · {m.kcal} kcal · P {m.protein}g · C {m.carbs}g · F {m.fat}g
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground capitalize">
+                      {f.category}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Serving (g)" value={grams} onChange={setGrams} placeholder="100" />
+          <Field label="Serving (g)" value={grams} onChange={recomputeFromGrams} placeholder="100" />
           <Field label="Calories" value={kcal} onChange={setKcal} placeholder="215" required />
         </div>
 
