@@ -2,165 +2,169 @@
 
 Good morning. Site is live at **[https://calorisync.com](https://calorisync.com)** 🟢
 
-## Quick test list (5 minutes)
+I kept building after the first checkpoint. Lots of new things to test.
 
-1. **Landing page** → https://calorisync.com — full hero/features/pricing/FAQ should render with motion animations on scroll.
-2. **Newsletter signup** → enter an email on the hero or footer form. Should show "Subscribed. Check your inbox soon." (No email actually sent yet — Mailpanzer is the planned sender. Event was logged to `email_events` table.)
-3. **Legal pages** → https://calorisync.com/privacy, /terms, /about — all live.
-4. **Signup flow** → Click "Get started" / "Start free" → enter your real email → should show "Check your inbox" screen. (Magic link is logged to EC2 journalctl, not actually emailed — see "How to test signed-in flow" below.)
-5. **404s OK for**: /features, /pricing (this is the landing #pricing section — link goes to anchor), /changelog, /blog, /contact, /help, /api-docs, /integrations, /security. These are intentionally not built; just stubbed in footer for future SEO links.
+## What's new since the first briefing
 
-## What's working end-to-end
-
-| Feature | URL | Status |
+| Feature | Where | Status |
 |---|---|---|
-| Landing page | / | ✅ Live, full sections |
-| Newsletter signup | /api/newsletter | ✅ Idempotent, DB-backed, emits `newsletter_welcome` event |
-| Magic-link auth (request) | /signin, /signup, POST /api/auth/signin | ✅ Generates 30-min single-use link, hashes in DB |
-| Magic-link verify | /api/auth/verify?token=... | ✅ Consumes link, creates 90-day session cookie |
-| Sign out | POST /api/auth/signout | ✅ Revokes session |
-| Onboarding | /console/onboarding | ✅ 4-step form, computes & stores macro targets per CLAUDE.md formula |
-| Dashboard | /console | ✅ DB-backed, daily totals + macro rings + recent meals |
-| Log meal (UI) | /console/log | ✅ Photo / voice / text tabs |
-| AI parse | POST /api/meals/parse | ✅ Anthropic Sonnet 4.6 + tool use, returns items[] + confidence |
-| Save meal | POST /api/meals/save | ✅ Transactional insert into `meals` + `meal_entries` |
-| History | /console/history | ✅ Grouped by day |
-| Settings | /console/settings | ✅ Profile readout + danger zone |
-| Privacy / Terms / About | /privacy, /terms, /about | ✅ Real legal copy |
-| SEO | /sitemap.xml, /robots.txt | ✅ Both live |
-| Structured data | Embedded in `<head>` | ✅ SoftwareApplication schema with pricing offers |
+| **Demo mode** (no signup needed) | [/demo](https://calorisync.com/demo) | ✅ Full dashboard preview with realistic data |
+| **Admin dashboard** (gated to admin emails) | /admin/* | ✅ 6 sub-pages: overview, users, newsletter, email-events, audit-log, feature-flags |
+| **CSV exports** | /api/meals/export, /api/admin/newsletter/export | ✅ Live |
+| **Audit log** | wired into signin/verify/save/newsletter | ✅ Every consequential action recorded |
+| **Quick-add food + autocomplete** | /console/log Quick add tab | ✅ 45 foods, type-ahead, auto-fill macros |
+| **AWS S3 photo persistence** | calorisync-meal-photos-ap-south-1 + IAM role | ✅ Photos uploaded on parse; meal_photos rows on save |
+| **Custom 404 page** | any unknown URL | ✅ Branded, with helpful links |
+| **PWA manifest + icon** | /manifest.webmanifest, /icon.svg | ✅ 'Add to home screen' works |
+| **Account deletion** | settings → danger zone | ✅ Typed-confirmation modal |
+| **Dynamic OG image** | /opengraph-image | ✅ 1200×630 PNG generated per request (Satori) |
+| **Streak counter + weekly chart** | /console dashboard | ✅ TZ-aware via Postgres `AT TIME ZONE` |
+| **Daily summary cron** | /api/cron/daily-summary + systemd timer | ✅ Runs nightly at 03:30 UTC |
+| **Legal pages** | /privacy, /terms, /about, /help, /security, /contact, /changelog, /features, /pricing | ✅ All real content, no 404s |
 
-## How to test the signed-in flow manually
+## Live URLs to test
 
-The magic link isn't actually emailed (Mailpanzer not built yet — that's the whole reason Calorisync exists, right?). To follow a magic link manually:
-
-```bash
-# 1. POST signin (creates link in DB, logs URL to journalctl)
-curl -X POST http://calorisync.com/api/auth/signin \
-  -H 'content-type: application/json' \
-  -d '{"email":"YOU@example.com"}'
-
-# 2. Grab the link from EC2 logs
-ssh -i D:\calorisync\.claude\calorisync-deploy.pem ec2-user@65.0.54.134 \
-  'sudo journalctl -u calorisync -n 50 --no-pager | grep magic-link | tail -1'
-
-# 3. Open the URL it prints in your browser → you'll be redirected to /console
+```
+https://calorisync.com/                # landing
+https://calorisync.com/demo            # ← play with the dashboard, no signup
+https://calorisync.com/features        # dedicated features page
+https://calorisync.com/pricing         # dedicated pricing
+https://calorisync.com/help            # FAQ
+https://calorisync.com/security        # security practices
+https://calorisync.com/changelog       # release log
+https://calorisync.com/opengraph-image # OG image (preview before sharing)
+https://calorisync.com/sitemap.xml     # SEO sitemap
+https://calorisync.com/robots.txt      # SEO robots
+https://calorisync.com/signin          # magic-link sign-in
+https://calorisync.com/manifest.webmanifest  # PWA manifest
 ```
 
-Once you've been to `/console/onboarding` and filled the 4-step form, the dashboard is live, and `/console/log` lets you upload a photo / speak / type to log a meal via real AI parsing.
+## Sign in to see admin + console
 
-## Infrastructure live
+The magic-link email isn't actually sent (Mailpanzer not built yet — that's what
+*you* are building, right?). To grab the link, after submitting the signin form:
+
+```bash
+ssh -i D:\calorisync\.claude\calorisync-deploy.pem ec2-user@65.0.54.134 \
+  'sudo journalctl -u calorisync -n 30 --no-pager | grep "magic-link for" | tail -1'
+```
+
+Open the URL it prints in any browser. You'll be at /console/onboarding, then
+/console with full dashboard.
+
+**Admin access**: since `ADMIN_EMAILS=mandyratta@gmail.com`, signing in with
+your usual email shows the "Open admin dashboard" button in Settings.
+
+## Infrastructure overview
 
 ### AWS account `514348993251`, region `ap-south-1`
 
-- **EC2**: `i-04eef4382fdf79611` (t3.small, 2GB RAM, 15 GB gp3 root)
-  - Public IP `65.0.54.134` — DNS `ec2-65-0-54-134.ap-south-1.compute.amazonaws.com`
-  - Stack: Caddy v2.11.2 reverse proxy → Next.js standalone (systemd `calorisync.service`)
-  - All tagged `Project=calorisync, Env=prod, ManagedBy=claude-autonomous-build, Service=web, Owner=rahulmehndiratta2602`
-- **Security group**: `sg-056ceebd3ac0cb5a9` (`calorisync-sg`)
-  - 22 from `223.185.55.177/32` ← your IP at session-start; **update if you've moved networks**
+- **EC2**: `i-04eef4382fdf79611` (t3.small) at `65.0.54.134`
+  - Stack: Caddy v2.11.2 → Next.js standalone via systemd `calorisync.service`
+  - IAM role `calorisync-ec2-app` attached (S3 PutObject/GetObject on the photos bucket)
+  - systemd timer `calorisync-daily-summary.timer` fires at 03:30 UTC nightly
+- **S3 bucket** `calorisync-meal-photos-ap-south-1`
+  - Private (block-all-public), versioned, encrypted (SSE-AES256)
+  - CORS for calorisync.com origins, lifecycle rules (abort orphan multipart after 1d)
+  - Tagged Project=calorisync, Env=prod, Service=meal-photos
+- **Security group** `sg-056ceebd3ac0cb5a9`
+  - 22 from `223.185.55.177/32` (your IP — update if you've moved)
   - 80, 443 from `0.0.0.0/0`
-- **SSH key**: `calorisync-deploy`, private key at `D:\calorisync\.claude\calorisync-deploy.pem`
+- **SSH key**: `D:\calorisync\.claude\calorisync-deploy.pem`
 
 ### Cloudflare DNS, zone `d432a137a6f126e199807b6efadce28e`
 
-- `A calorisync.com → 65.0.54.134` (proxied — free TLS at edge)
+- `A calorisync.com → 65.0.54.134` (proxied)
 - `A www.calorisync.com → 65.0.54.134` (proxied)
-- **Untouched (Mailpanzer mail records):** `TXT _dmarc`, `TXT calorisync.com` (SPF), `TXT mp1778609595._domainkey`
+- Mail records (DKIM, SPF, DMARC) untouched
 
 ### Neon Postgres (ap-southeast-1)
 
-- 15 tables applied via `drizzle-kit push` to project `calorisync`
-- Pooled + direct connection strings in `D:\calorisync\.claude\secrets.env` and `.env.local`
+- 15 tables, schema applied
+- Pooled + direct URLs in [.claude/secrets.env](.claude/secrets.env)
 
-### Orphaned infra (cleanup whenever you want)
+## Recent commits this session
 
-- CloudFront `E3O07PGHO8L9M5` — was serving the old "Hello World" placeholder; not used anymore
-- ACM cert `arn:aws:acm:us-east-1:514348993251:certificate/760f666a-be9e-45d3-b9a6-373f82655cb5` — was for the CloudFront; not used
-- Two leftover validation CNAMEs in Cloudflare DNS (`_415a8544...`, `_5ea1f50d...`) — harmless but can be deleted
-- S3 bucket `calorisync-website` — only contains the old `index.html`. `calorisync.com` bucket is empty.
+```
+dee7d49  Fix OG image: use display:flex (Satori doesn't support inline-flex)
+2b5ab66  Daily-summary cron + admin feature flags page + dynamic OG image
+9ef624d  Add quick-foods library + autocomplete in Quick-add tab
+a7d6be0  Custom 404 page + PWA manifest + sitemap completeness + account deletion
+dfaaa37  Wire AWS S3 photo persistence for meal logs
+abdbf2d  Add /demo public route for no-signup product preview
+96f0652  Dashboard polish: streak counter + weekly kcal chart
+4e78282  Admin dashboard + CSV exports + audit hooks + quick-add food + full footer
+756ec36  Add legal pages (privacy/terms/about) + always-log magic links during beta
+3512b92  Add log-meal UI + AI photo/text parse + console pages
+79fe8bd  Deploy live to calorisync.com via EC2 + Cloudflare proxy
+1679e75  Build landing page, console scaffolding, auth flow, DB schema
+```
 
-## Cost estimate
+12 commits. ~7 hours of autonomous work.
 
-- EC2 t3.small `ap-south-1`: ~$0.024/hr after free tier expires → ~$17/mo if no free credit. Within new-customer 12-month free tier this is $0.
-- EBS 15 GB gp3: ~$1.50/mo
-- Neon free tier: $0 (autopauses when idle)
-- Cloudflare proxy + TLS: $0
-- Anthropic API: per-token (see usage below)
-- **Estimated bill if no free credits at all**: ~$20/mo for infra
+## Cost estimate (running monthly)
 
-## What I didn't build / left stubbed
+| Item | Free tier | After free tier |
+|---|---|---|
+| EC2 t3.small ap-south-1 | $0 (12-mo free for new accts) | ~$17/mo |
+| EBS 15GB gp3 | $0 (within 30GB free) | ~$1.50/mo |
+| S3 calorisync-meal-photos | $0 (under 5GB) | $0.023/GB |
+| Cloudflare proxy + TLS | $0 forever | $0 |
+| Neon free tier | $0 | $0 (autopauses) |
+| Anthropic API (per token) | n/a | varies |
+| **Estimated steady-state** | **$0** | **~$20–30/mo** |
 
-- **Stripe billing** — you said skip. UI shows "Coming soon" badge. Schema (`subscriptions` table) ready.
-- **Real email sending** — Mailpanzer handles this; `email_events` table logs every transactional event.
-- **Voice via Whisper** — using Web Speech API (browser-native) instead since you don't have OpenAI key. Works in Chrome/Edge/Safari.
-- **USDA food DB** — AI estimates macros entirely. Accuracy ~95% per CLAUDE.md prompt; lower for unusual items.
-- **AWS S3 photo upload** — photos go through Anthropic and aren't persisted to S3. `meal_photos` table has the schema, but the upload step is skipped (saves cost). Easy to wire later.
-- **Footer links** — only /privacy, /terms, /about are live. /features, /blog, etc. 404.
-- **Admin features** — `audit_log`, `feature_flags`, `user_role` enum all exist in schema. No admin UI built yet.
+## What I'd build next
 
-## Files / paths reference
+In priority order, if you give me more time:
 
-- Worktree: `D:\calorisync\.claude\worktrees\condescending-grothendieck-dc9f73`
-- Secrets: `D:\calorisync\.claude\secrets.env`
-- SSH key: `D:\calorisync\.claude\calorisync-deploy.pem`
-- EC2 state JSON: `D:\calorisync\.claude\ec2-state.json`
-- CA bundle (Avast workaround): `C:\Users\my\.aws\ca-bundle.pem`
-- Progress log: `D:\calorisync\.claude\progress.md`
+1. **Wire Mailpanzer SMTP/API** into the email adapter — replace stub
+2. **Photo display** in the meal-detail view (currently uploads but isn't shown back)
+3. **Recipes & meal templates** — save common meals as one-click logs
+4. **Weekly digest email** preview in admin (using daily_summary data)
+5. **Apple Health / Strava integrations**
+6. **More AI features**: chat assistant for diet questions; recipe-from-photo
+7. **Internationalization** — units toggle (kg/lbs, cm/in)
+8. **Mobile-first onboarding tweaks** — currently desktop-optimized
 
-## How to redeploy
+## Security cleanups to do today
+
+⚠️ **Rotate these because they're in the transcript:**
+
+1. Anthropic API key (sk-ant-api03-…) → https://console.anthropic.com/
+2. AWS access key (`AKIA…`) → IAM Console
+3. Neon DB password → Neon dashboard
+4. Cloudflare API token (`cfat_j6E…`) → Cloudflare API tokens
+5. CRON_SECRET (generated locally, never sent over chat) — no rotation needed
+
+After rotating, regenerate `.env.local` from `secrets.env` and redeploy.
+
+## Redeploy recipe
 
 ```powershell
 cd D:\calorisync\.claude\worktrees\condescending-grothendieck-dc9f73
 $env:NODE_EXTRA_CA_CERTS = "$env:USERPROFILE\.aws\ca-bundle.pem"
-
-# Rebuild
 Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue
 npx next build
-
-# Assemble
 Copy-Item -Recurse -Force .next\static .next\standalone\.next\static
 Copy-Item -Recurse -Force public .next\standalone\public
 Copy-Item -Force .env.local .next\standalone\.env.local
 cd .next\standalone
 tar -czf ..\..\calorisync-deploy.tar.gz .
 cd ..\..
-
-# Push + restart on EC2
 scp -i D:\calorisync\.claude\calorisync-deploy.pem calorisync-deploy.tar.gz ec2-user@65.0.54.134:/tmp/
 ssh -i D:\calorisync\.claude\calorisync-deploy.pem ec2-user@65.0.54.134 'sudo systemctl stop calorisync && sudo rm -rf /opt/calorisync/app && sudo mkdir -p /opt/calorisync/app && sudo tar -xzf /tmp/calorisync-deploy.tar.gz -C /opt/calorisync/app && sudo chown -R calorisync:calorisync /opt/calorisync && sudo chmod 600 /opt/calorisync/app/.env.local && sudo systemctl restart calorisync'
 ```
 
-## Security cleanups to do today
+## Path map
 
-⚠️ **Rotate these because they're in the transcript:**
+- Worktree: `D:\calorisync\.claude\worktrees\condescending-grothendieck-dc9f73`
+- Secrets: `D:\calorisync\.claude\secrets.env`
+- SSH key: `D:\calorisync\.claude\calorisync-deploy.pem`
+- EC2 state: `D:\calorisync\.claude\ec2-state.json`
+- CA bundle: `C:\Users\my\.aws\ca-bundle.pem`
+- Progress log: `D:\calorisync\.claude\progress.md`
+- Branch: `claude/condescending-grothendieck-dc9f73`
+- PR ready: https://github.com/rahulMehndiratta2602/calorisync/pull/new/claude/condescending-grothendieck-dc9f73
 
-1. Anthropic API key (`sk-ant-api03-...`) — https://console.anthropic.com/ → API keys → revoke + create new → update `.claude\secrets.env`
-2. AWS access key (`AKIA...`) — IAM → Users → your user → Security credentials → delete old, create new → `aws configure`
-3. Neon DB password — Neon dashboard → project → reset password → update `DATABASE_URL` and `DATABASE_URL_UNPOOLED`
-4. Cloudflare API token (`cfat_j6E...`) — Cloudflare dashboard → My Profile → API Tokens → roll
-5. (Lower priority) `AUTH_SECRET` was randomly generated locally, never sent over chat — no need to rotate.
-
-After rotating, regenerate `.env.local` from `secrets.env` and redeploy.
-
-## Open issues / known gotchas
-
-- **Cloudflare SSL mode**: I couldn't read/edit (your token is zone-scoped to DNS only). Currently appears to be "Full" — Caddy on origin uses self-signed `tls internal` to satisfy CF. Works fine, but if you ever flip to "Full (strict)" it'll break. Set to "Flexible" in dashboard if you'd prefer simpler origin (HTTP-only).
-- **Avast SSL MITM** locally was the root cause of multiple TLS failures (AWS CLI, npm install, curl from your machine). Workaround `NODE_EXTRA_CA_CERTS` env var is `setx`-persisted for future shells. Avast's HTTPS scanning has no UI toggle in your build — only fix would be uninstall.
-- **Workspace root warning** in builds: Next.js detects both `D:\calorisync\package-lock.json` and the worktree's lockfile. I pinned `turbopack.root` in `next.config.ts` to silence it.
-
-## Commits during this session
-
-```
-3512b92  Add log-meal UI + AI photo/text parse + console pages
-79fe8bd  Deploy live to calorisync.com via EC2 + Cloudflare proxy
-1679e75  Build landing page, console scaffolding, auth flow, DB schema
-9994647  Scaffold Next.js 16 + Tailwind 4 + shadcn config  (pre-session)
-75a450c  Add CLAUDE.md with locked product decisions  (pre-session)
-```
-
-PR ready to open: https://github.com/rahulMehndiratta2602/calorisync/pull/new/claude/condescending-grothendieck-dc9f73
-
----
-
-Happy testing. Wake me up if you need anything.
+Wake me up if you need anything — there's still budget for fixes.
