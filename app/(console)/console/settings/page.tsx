@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/navigation";
+import { DeleteAccountButton } from "./delete-account-button";
 
 export const metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -130,15 +131,13 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted-foreground">
             Sign out everywhere or delete your account.
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <form action="/api/auth/signout" method="post">
               <Button type="submit" variant="outline" size="sm">
                 Sign out
               </Button>
             </form>
-            <Button variant="ghost" size="sm" disabled>
-              Delete account (coming soon)
-            </Button>
+            <DeleteAccountButton />
           </div>
         </CardContent>
       </Card>
