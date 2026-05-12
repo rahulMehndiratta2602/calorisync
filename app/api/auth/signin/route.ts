@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createMagicLink } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
+import { audit } from "@/lib/audit";
 import { publicEnv } from "@/lib/env";
 
 export const runtime = "nodejs";

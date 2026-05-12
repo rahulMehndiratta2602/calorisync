@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { eq } from "drizzle-orm";
+import { Download, Shield } from "lucide-react";
 import { getCurrentSession } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
+import { isAdminEmail } from "@/lib/admin";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,6 +78,23 @@ export default async function SettingsPage() {
 
       <Card>
         <CardContent className="flex flex-col gap-3 p-6">
+          <p className="text-sm font-semibold">Data</p>
+          <p className="text-sm text-muted-foreground">
+            Download a CSV of every meal you've logged, with full macro breakdown per item.
+          </p>
+          <div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/api/meals/export">
+                <Download className="size-4" />
+                Export meals as CSV
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col gap-3 p-6">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold">Billing</p>
             <Badge variant="soft">Coming soon</Badge>
@@ -84,6 +104,25 @@ export default async function SettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {isAdminEmail(sess.user.email) && (
+        <Card>
+          <CardContent className="flex flex-col gap-3 p-6">
+            <div className="flex items-center gap-2">
+              <Shield className="size-4 text-destructive" />
+              <p className="text-sm font-semibold">Admin tools</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              You have admin access. View platform-wide users, signups, and email events.
+            </p>
+            <div>
+              <Button asChild size="sm">
+                <Link href="/admin">Open admin dashboard</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardContent className="flex flex-col gap-3 p-6">

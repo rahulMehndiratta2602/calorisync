@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeMagicLink, upsertUserByEmail, createSession, setSessionCookie } from "@/lib/auth";
+import { audit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,14 @@ export async function GET(req: NextRequest) {
   const user = await upsertUserByEmail(result.email!);
   const { token: sessionToken, expiresAt } = await createSession(user.id);
   await setSessionCookie(sessionToken, expiresAt);
+
+  audit({
+    actorUserId: user.id,
+    action: "auth.signed_in",
+    targetType: "user",
+    targetId: user.id,
+    metadata: { email: user.email },
+  }).catch(() => {});
 
   const redirectTo = result.redirectTo || "/console";
   return NextResponse.redirect(new URL(redirectTo, url));

@@ -13,6 +13,7 @@ import {
   X,
   Sparkles,
   Edit3,
+  Plus,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -43,11 +44,11 @@ interface ParseResult {
 
 export function LogMealClient() {
   const router = useRouter();
-  const [tab, setTab] = React.useState<"photo" | "voice" | "text">("photo");
+  const [tab, setTab] = React.useState<"photo" | "voice" | "text" | "manual">("photo");
   const [parsing, setParsing] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [result, setResult] = React.useState<ParseResult | null>(null);
-  const [source, setSource] = React.useState<"photo" | "voice" | "text">("photo");
+  const [source, setSource] = React.useState<"photo" | "voice" | "text" | "manual">("photo");
 
   async function parse(args: {
     mode: "photo" | "text";
@@ -127,7 +128,7 @@ export function LogMealClient() {
           setResult(null);
         }}
       >
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-xl grid-cols-4">
           <TabsTrigger value="photo">
             <Camera className="size-3.5" /> Photo
           </TabsTrigger>
@@ -136,6 +137,9 @@ export function LogMealClient() {
           </TabsTrigger>
           <TabsTrigger value="text">
             <Type className="size-3.5" /> Text
+          </TabsTrigger>
+          <TabsTrigger value="manual">
+            <Plus className="size-3.5" /> Quick add
           </TabsTrigger>
         </TabsList>
 
@@ -147,6 +151,9 @@ export function LogMealClient() {
         </TabsContent>
         <TabsContent value="text">
           <TextPanel parsing={parsing} onParse={(t) => parse({ mode: "text", text: t })} />
+        </TabsContent>
+        <TabsContent value="manual">
+          <ManualPanel router={router} />
         </TabsContent>
       </Tabs>
 
@@ -567,6 +574,158 @@ function ResultCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// ───────── Manual quick-add panel ─────────
+
+function ManualPanel({ router }: { router: ReturnType<typeof useRouter> }) {
+  const [name, setName] = React.useState("");
+  const [grams, setGrams] = React.useState("100");
+  const [kcal, setKcal] = React.useState("");
+  const [protein, setProtein] = React.useState("");
+  const [carbs, setCarbs] = React.useState("");
+  const [fat, setFat] = React.useState("");
+  const [mealType, setMealType] = React.useState<"breakfast" | "lunch" | "dinner" | "snack" | "other">("other");
+  const [saving, setSaving] = React.useState(false);
+
+  async function onSave() {
+    if (!name || !kcal) {
+      toast.error("Name and calories are required.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/meals/save", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          meal_type: mealType,
+          source: "manual",
+          summary: name,
+          overall_confidence: 1.0,
+          items: [
+            {
+              name,
+              grams: Number(grams) || 0,
+              kcal: Number(kcal) || 0,
+              protein_g: Number(protein) || 0,
+              carbs_g: Number(carbs) || 0,
+              fat_g: Number(fat) || 0,
+              confidence: 1.0,
+            },
+          ],
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(json.error || "Couldn't save.");
+        return;
+      }
+      toast.success(`Logged ${json.totals.kcal} kcal.`);
+      router.push("/console");
+      router.refresh();
+    } catch {
+      toast.error("Network error.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="flex flex-col gap-5 p-6 sm:p-8">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Food name
+          </label>
+          <Input
+            placeholder="e.g. Brown rice (cooked)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="text-base"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Serving (g)" value={grams} onChange={setGrams} placeholder="100" />
+          <Field label="Calories" value={kcal} onChange={setKcal} placeholder="215" required />
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Field label="Protein (g)" value={protein} onChange={setProtein} placeholder="5" />
+          <Field label="Carbs (g)" value={carbs} onChange={setCarbs} placeholder="45" />
+          <Field label="Fat (g)" value={fat} onChange={setFat} placeholder="2" />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Meal type
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {(["breakfast", "lunch", "dinner", "snack", "other"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-medium capitalize transition-colors",
+                  mealType === m
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground",
+                )}
+                onClick={() => setMealType(m)}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Button size="lg" onClick={onSave} disabled={saving}>
+            {saving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Saving...
+              </>
+            ) : (
+              <>
+                <Check className="size-4" /> Log meal
+              </>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  required?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+        {required && <span className="ml-1 text-destructive">*</span>}
+      </label>
+      <Input
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
   );
 }
 

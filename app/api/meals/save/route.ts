@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { getCurrentSession } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { audit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -109,6 +110,20 @@ export async function POST(req: NextRequest) {
       })),
     );
   });
+
+  // Audit + fire-and-forget side effects.
+  audit({
+    actorUserId: sess.user.id,
+    action: "meal.logged",
+    targetType: "meal",
+    targetId: mealId ?? undefined,
+    metadata: {
+      source: parsed.data.source,
+      kcal: Math.round(totals.kcal),
+      items: parsed.data.items.length,
+      confidence: parsed.data.overall_confidence,
+    },
+  }).catch(() => {});
 
   // Fire-and-forget: first-meal email event for downstream marketing flows.
   const mealCount = await db.$count(schema.meals, eq(schema.meals.userId, sess.user.id));

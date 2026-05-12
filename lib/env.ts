@@ -31,6 +31,10 @@ export const env = {
   STRIPE_PRICE_MONTHLY_ID: optional("STRIPE_PRICE_MONTHLY_ID"),
   STRIPE_PRICE_ANNUAL_ID: optional("STRIPE_PRICE_ANNUAL_ID"),
   SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || "https://calorisync.com",
+  ADMIN_EMAILS: (process.env.ADMIN_EMAILS || "mandyratta@gmail.com")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
 };
 
 export const publicEnv = {

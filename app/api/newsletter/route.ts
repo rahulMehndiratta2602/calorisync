@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { audit } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +100,13 @@ export async function POST(req: NextRequest) {
         template: "newsletter_welcome",
         payload: { source: parsed.data.source ?? null },
       }).catch((err) => console.error("[newsletter] welcome email failed:", err));
+
+      audit({
+        action: "newsletter.subscribed",
+        targetType: "newsletter",
+        targetId: subId,
+        metadata: { source: parsed.data.source ?? null, email },
+      }).catch(() => {});
     }
 
     return NextResponse.json({ ok: true, id: subId, isNew }, { status: 200 });
