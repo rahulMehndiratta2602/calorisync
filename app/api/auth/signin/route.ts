@@ -38,9 +38,9 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[auth] magic link for ${email}: ${link}`);
-  }
+  // Beta: always log so we can test sign-in without a real email provider.
+  // Once Mailpanzer is wired up, remove or gate behind BETA_LOG_MAGIC_LINKS.
+  console.log(`[auth] magic-link for ${email}: ${link}`);
 
   return NextResponse.json({ ok: true });
 }
