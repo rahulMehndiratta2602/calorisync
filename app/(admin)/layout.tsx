@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, Mail, ListChecks, LogOut, Shield, ToggleLeft } from "lucide-react";
+import { LayoutDashboard, Users, Mail, ListChecks, LogOut, Shield, ToggleLeft, BarChart3 } from "lucide-react";
 import { requireAdmin } from "@/lib/admin";
 import { Logo } from "@/components/logo";
 
@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 const NAV = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "Insights", href: "/admin/insights", icon: BarChart3 },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { label: "Email events", href: "/admin/email-events", icon: Mail },
