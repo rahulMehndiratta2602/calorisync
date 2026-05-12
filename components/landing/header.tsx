@@ -48,6 +48,12 @@ export function LandingHeader() {
               {l.label}
             </Link>
           ))}
+          <Link
+            href="/demo"
+            className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Demo
+          </Link>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">

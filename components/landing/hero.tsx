@@ -76,12 +76,12 @@ export function HeroSection() {
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="mt-12 flex items-center gap-3"
+          className="mt-12 flex flex-wrap items-center justify-center gap-3"
         >
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="#features" className="gap-1.5 text-muted-foreground">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/demo" className="gap-1.5">
               <Play className="size-3.5 fill-current" />
-              {h.cta_secondary}
+              Try the demo
             </Link>
           </Button>
           <span className="text-xs text-muted-foreground">{h.social_proof_microcopy}</span>
