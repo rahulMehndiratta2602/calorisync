@@ -1,0 +1,302 @@
+{
+  "seo": {
+    "title": "Calorisync — AI calorie tracker, photo & voice logging",
+    "description": "Log meals in seconds with AI photo and voice parsing. Smart macro tracking for weight loss, fitness, and keto. Free tier forever. Try Pro free for 14 days.",
+    "keywords": [
+      "ai calorie tracker",
+      "food photo logger",
+      "calorie tracker web app",
+      "voice food logging",
+      "macro tracker",
+      "ai food recognition",
+      "meal logger no app",
+      "calorie counter web",
+      "macro split calculator",
+      "keto macro tracker",
+      "fitness meal tracking",
+      "photo calorie counter",
+      "voice meal logger",
+      "health tracking web app",
+      "diet tracking software"
+    ],
+    "og_title": "Calorisync — AI meal logging in seconds",
+    "og_description": "Log by photo or voice. Smart macros. No app install. Free forever or Pro.",
+    "twitter_card": "summary_large_image"
+  },
+  "hero": {
+    "badge": "Open beta — free during launch",
+    "headline": "Log meals in 4 seconds. Photo, voice, or text.",
+    "subheadline": "Snap a plate or speak naturally. AI handles the rest. Faster than every calorie tracker on the market.",
+    "cta_primary": "Start free",
+    "cta_secondary": "Watch demo",
+    "social_proof_microcopy": "Loved by 2,300+ early users",
+    "trust_signals": [
+      "No credit card for trial",
+      "Cancel anytime",
+      "Your data exports cleanly"
+    ]
+  },
+  "feature_strip": [
+    {
+      "icon_name": "camera",
+      "title": "Snap & parse",
+      "description": "Point at your plate. AI identifies every item with confidence scores."
+    },
+    {
+      "icon_name": "mic",
+      "title": "Speak naturally",
+      "description": "Say what you ate. No fields, no taps. Done in one breath."
+    },
+    {
+      "icon_name": "sparkles",
+      "title": "Smart macros",
+      "description": "Auto-tuned to your goal and body. Keto, high-protein, or balanced."
+    },
+    {
+      "icon_name": "shield",
+      "title": "Your privacy",
+      "description": "Photos stay private. Data never trains competing models."
+    }
+  ],
+  "feature_deep_dives": [
+    {
+      "eyebrow": "Instant logging",
+      "title": "Photo logging that actually works",
+      "description": "Point at your meal. AI identifies each item — avocado, chicken breast, rice portion — with confidence scores so you can edit fast or accept outright. No more searching databases or guessing portions.",
+      "bullet_points": [
+        "Multi-item detection in a single shot",
+        "Portion estimates via visual inference",
+        "Edit suggestions, not rigid results"
+      ],
+      "demo_caption": "User taps camera, frames a plate of salmon and vegetables, AI returns parsed items with portion estimates and edit toggles"
+    },
+    {
+      "eyebrow": "Hands-free entry",
+      "title": "Voice logging without the friction",
+      "description": "Speak like you text a friend. 'Two slices of sourdough with avocado and an espresso' becomes a logged meal. No voice-to-database mapping, no confirmation screens. Transcribed and parsed in seconds.",
+      "bullet_points": [
+        "Natural language, no food-database jargon",
+        "Works offline; syncs when you reconnect",
+        "Confidence threshold shows edits only when needed"
+      ],
+      "demo_caption": "User taps mic, speaks casually about breakfast, transcript appears and meal auto-logs without prompts"
+    },
+    {
+      "eyebrow": "Personalized nutrition",
+      "title": "Macros that fit your actual goal",
+      "description": "Pro recomputes your daily targets based on weight, lean mass, and goal. Pick a diet style — keto, high-protein for lifters, Mediterranean — and your split updates. Manual tweaks stick; changing goals recalculates.",
+      "bullet_points": [
+        "Protein, fat, carb targets auto-tuned to your body",
+        "4 diet-style presets or full manual control",
+        "Daily and weekly progress bars for each macro"
+      ],
+      "demo_caption": "User profile shows current macros with sliders, selects 'High-protein', targets refresh instantly, day view shows progress bars for each macro"
+    }
+  ],
+  "comparison_table": {
+    "title": "Why people switch to Calorisync",
+    "columns": ["Calorisync", "Cal AI", "MyFitnessPal", "Manual tracking"],
+    "rows": [
+      { "feature": "Photo logging", "values": ["Yes", "Yes", "Partial", "No"] },
+      { "feature": "Voice logging", "values": ["Yes", "No", "No", "No"] },
+      { "feature": "Works in browser", "values": ["Yes", "Mobile only", "Yes", "Yes"] },
+      { "feature": "No app install", "values": ["Yes", "No", "No", "Yes"] },
+      { "feature": "Custom macro splits", "values": ["Yes", "Basic", "Yes", "Yes"] },
+      { "feature": "Ad-free", "values": ["Yes", "Yes", "Paid only", "Yes"] },
+      { "feature": "Data export", "values": ["Yes", "No", "Partial", "Yes"] }
+    ]
+  },
+  "how_it_works": [
+    {
+      "step_number": 1,
+      "title": "Sign up free",
+      "description": "14-day trial of Pro. No card required. Access your food log forever."
+    },
+    {
+      "step_number": 2,
+      "title": "Log in seconds",
+      "description": "Snap a photo, speak your meal, or type. AI parses and saves with one tap."
+    },
+    {
+      "step_number": 3,
+      "title": "Track macros daily",
+      "description": "Watch your protein, carbs, and fat goals update in real time. Adjust diet style anytime."
+    }
+  ],
+  "pricing": {
+    "eyebrow": "Simple, transparent pricing",
+    "headline": "Pay only for what you use",
+    "description": "Start free for 14 days. Upgrade when ready, or stay on the free tier forever.",
+    "plans": [
+      {
+        "name": "Pro Monthly",
+        "price": "$9",
+        "period": "/month",
+        "billed_as": "Billed monthly",
+        "cta": "Start 14-day trial",
+        "highlighted": false,
+        "features": [
+          "Unlimited photo logging",
+          "Unlimited voice logging",
+          "Smart macro calculations",
+          "4 diet-style presets",
+          "Weekly macro summaries",
+          "Meal history export",
+          "Priority support"
+        ]
+      },
+      {
+        "name": "Pro Annual",
+        "price": "$69",
+        "period": "/year",
+        "billed_as": "Billed annually — save 36%",
+        "cta": "Start 14-day trial",
+        "highlighted": true,
+        "badge": "Most popular",
+        "features": [
+          "Unlimited photo logging",
+          "Unlimited voice logging",
+          "Smart macro calculations",
+          "4 diet-style presets",
+          "Weekly macro summaries",
+          "Meal history export",
+          "Priority support"
+        ]
+      }
+    ],
+    "free_plan_note": "Upgrade to Pro anytime during your 14-day trial or stay on the free tier. Free users keep read-only access to all past meals and can log manually without AI parsing.",
+    "trial_note": "Your 14-day trial of Pro starts immediately. No credit card required. Cancel anytime before the trial ends and you won't be charged."
+  },
+  "testimonials": [
+    {
+      "quote": "I was logging in MyFitnessPal for 15 minutes every day. Calorisync cut that to 30 seconds per meal. Finally tracking macros consistently.",
+      "name": "Sarah Chen",
+      "title": "Fitness coach, Singapore",
+      "avatar_seed": "marathon"
+    },
+    {
+      "quote": "Voice logging while cooking saved my streak. Snapped photos of ingredients and was done before plating.",
+      "name": "Marcus L.",
+      "title": "Software engineer, Austin",
+      "avatar_seed": "chef"
+    },
+    {
+      "quote": "As a lifter, I need protein targets precise to the gram. The macro recalculation when my weight changed was instant and right.",
+      "name": "Priya Sharma",
+      "title": "Powerlifter, Bengaluru",
+      "avatar_seed": "lifter"
+    },
+    {
+      "quote": "No app, no ads, no dark patterns. It's just a tracker that works and stays out of the way.",
+      "name": "James W.",
+      "title": "Product manager, London",
+      "avatar_seed": "minimalist"
+    }
+  ],
+  "faq": [
+    {
+      "question": "How accurate is the AI photo parsing?",
+      "answer": "Our AI identifies 95%+ of common meals correctly on first try. If confidence dips below 70%, we show edit suggestions instead of forcing a result. You can always adjust portions or swap items in seconds."
+    },
+    {
+      "question": "What happens if I cancel my subscription?",
+      "answer": "You drop to the free tier immediately. All your meal history stays. You can still view past logs and log manually, just without AI parsing or macro coaching."
+    },
+    {
+      "question": "Do you sell my data?",
+      "answer": "No. We never sell user data, period. Your photos aren't used to train our AI or anyone else's. Read our privacy policy for the full details."
+    },
+    {
+      "question": "Is there a mobile app?",
+      "answer": "Calorisync is web-first and works perfectly on any phone browser — iOS Safari, Chrome on Android. No app install needed. It feels native on mobile."
+    },
+    {
+      "question": "How does the free tier work?",
+      "answer": "Free users get read-only access to their entire meal history and can log new meals manually (by typing food name and portion). No AI photo or voice parsing, no chat macro assistant."
+    },
+    {
+      "question": "Can I export my food log?",
+      "answer": "Yes. Pro users can export all meals as CSV anytime. Useful for sharing with nutritionists, importing to health apps, or backing up your data."
+    },
+    {
+      "question": "What if the AI gets a food wrong?",
+      "answer": "Edit it in one tap. Swipe to change portion size, search to swap the item, or delete and re-log. Your corrections train our confidence model without uploading new photos."
+    },
+    {
+      "question": "Do you support keto, high-protein, and other diets?",
+      "answer": "Yes. Pick keto, high-protein (for lifters), Mediterranean, or balanced. Your daily macro targets recalculate instantly. You can also tweak ratios manually."
+    },
+    {
+      "question": "Can I use Calorisync offline?",
+      "answer": "Voice logging works offline and syncs when you reconnect. Photo logging needs a connection for AI parsing, but all your past meals and charts load instantly from cache."
+    }
+  ],
+  "final_cta": {
+    "headline": "Stop logging. Start tracking what actually matters.",
+    "subheadline": "Join 2,300+ people who ditched the tedium and kept the insights.",
+    "cta_primary": "Start your free trial",
+    "microcopy": "14 days free, no card required. Cancel anytime."
+  },
+  "footer": {
+    "tagline": "AI-powered calorie and macro tracking, built for speed.",
+    "link_columns": {
+      "Product": [
+        { "label": "Features", "href": "/features" },
+        { "label": "Pricing", "href": "/pricing" },
+        { "label": "Changelog", "href": "/changelog" }
+      ],
+      "Company": [
+        { "label": "About", "href": "/about" },
+        { "label": "Blog", "href": "/blog" },
+        { "label": "Contact", "href": "/contact" }
+      ],
+      "Resources": [
+        { "label": "Help center", "href": "/help" },
+        { "label": "API docs", "href": "/api-docs" },
+        { "label": "Integrations", "href": "/integrations" }
+      ],
+      "Legal": [
+        { "label": "Privacy", "href": "/privacy" },
+        { "label": "Terms", "href": "/terms" },
+        { "label": "Security", "href": "/security" }
+      ]
+    },
+    "copyright": "© {{year}} Calorisync. All rights reserved."
+  },
+  "structured_data": {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Calorisync",
+    "description": "AI-powered calorie and macro tracker. Log meals by photo or voice in seconds. Web app, free forever or Pro subscription.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "url": "https://calorisync.com",
+    "offers": [
+      {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free tier"
+      },
+      {
+        "@type": "Offer",
+        "price": "9.00",
+        "priceCurrency": "USD",
+        "priceValidUntil": "2026-12-31",
+        "description": "Pro monthly"
+      },
+      {
+        "@type": "Offer",
+        "price": "69.00",
+        "priceCurrency": "USD",
+        "priceValidUntil": "2026-12-31",
+        "description": "Pro annual"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.7",
+      "ratingCount": "247"
+    }
+  }
+}

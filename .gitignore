@@ -19,6 +19,10 @@
 
 # production
 /build
+build.log
+.npm-install.log
+.npm-install.log.err
+
 
 # misc
 .DS_Store
