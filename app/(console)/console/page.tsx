@@ -1,13 +1,16 @@
 import Link from "next/link";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { Plus, Flame, Beef, Wheat, Droplet } from "lucide-react";
 import { getCurrentSession } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
 import { calculateTargets, ageFromDob } from "@/lib/macros";
+import { getWeekBuckets, getStreaks } from "@/lib/dashboard-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { WeeklyChart } from "@/components/console/weekly-chart";
+import { StreakCard } from "@/components/console/streak-card";
 import { redirect } from "next/navigation";
 
 export const metadata = { title: "Today" };
@@ -39,14 +42,18 @@ export default async function ConsoleDashboard() {
   const tz = profile.timezone || "UTC";
   const today = startOfLocalDay(tz);
 
-  const meals = await db.query.meals.findMany({
-    where: and(
-      eq(schema.meals.userId, sess.user.id),
-      eq(schema.meals.logDate, today),
-    ),
-    orderBy: [desc(schema.meals.loggedAt)],
-    limit: 12,
-  });
+  const [meals, weekBuckets, streaks] = await Promise.all([
+    db.query.meals.findMany({
+      where: and(
+        eq(schema.meals.userId, sess.user.id),
+        eq(schema.meals.logDate, today),
+      ),
+      orderBy: [desc(schema.meals.loggedAt)],
+      limit: 12,
+    }),
+    getWeekBuckets(sess.user.id, tz),
+    getStreaks(sess.user.id, tz),
+  ]);
 
   // Compute totals.
   const totals = meals.reduce(
@@ -161,6 +168,15 @@ export default async function ConsoleDashboard() {
           icon={<Droplet className="size-4 text-chart-4" />}
           tint="bg-chart-4"
         />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
+        <StreakCard
+          currentStreak={streaks.current}
+          longestStreak={streaks.longest}
+          daysLogged7={streaks.daysLogged7}
+        />
+        <WeeklyChart days={weekBuckets} targetKcal={targets.kcal} />
       </div>
 
       <section>
