@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, Mail, ListChecks, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, Mail, ListChecks, LogOut, Shield, ToggleLeft } from "lucide-react";
 import { requireAdmin } from "@/lib/admin";
 import { Logo } from "@/components/logo";
 
@@ -12,6 +12,7 @@ const NAV = [
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { label: "Email events", href: "/admin/email-events", icon: Mail },
   { label: "Audit log", href: "/admin/audit-log", icon: ListChecks },
+  { label: "Feature flags", href: "/admin/feature-flags", icon: ToggleLeft },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

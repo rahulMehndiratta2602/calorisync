@@ -35,6 +35,7 @@ export const env = {
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean),
+  CRON_SECRET: optional("CRON_SECRET"),
 };
 
 export const publicEnv = {

@@ -51,20 +51,14 @@ export const metadata: Metadata = {
     url: SITE,
     siteName: "Calorisync",
     locale: "en_US",
-    images: [
-      {
-        url: "/og.png",
-        width: 1200,
-        height: 630,
-        alt: "Calorisync — AI calorie tracker",
-      },
-    ],
+    // /opengraph-image.tsx generates the 1200×630 PNG at /opengraph-image
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Calorisync" }],
   },
   twitter: {
     card: "summary_large_image",
     title: seo.og_title,
     description: seo.og_description,
-    images: ["/og.png"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
