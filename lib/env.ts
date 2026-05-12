@@ -23,7 +23,14 @@ export const env = {
   ANTHROPIC_API_KEY: required("ANTHROPIC_API_KEY"),
   AUTH_SECRET: required("AUTH_SECRET"),
   EMAIL_FROM: process.env.EMAIL_FROM || "hello@calorisync.com",
-  EMAIL_PROVIDER: (process.env.EMAIL_PROVIDER || "stub") as "stub" | "resend" | "ses",
+  EMAIL_PROVIDER: (process.env.EMAIL_PROVIDER || "stub") as
+    | "stub"
+    | "resend"
+    | "ses"
+    | "mailpanzer",
+  MAILPANZER_API_URL: optional("MAILPANZER_API_URL"),
+  MAILPANZER_API_KEY: optional("MAILPANZER_API_KEY"),
+  MAILPANZER_WEBHOOK_SECRET: optional("MAILPANZER_WEBHOOK_SECRET"),
   RESEND_API_KEY: optional("RESEND_API_KEY"),
   USDA_API_KEY: optional("USDA_API_KEY"),
   STRIPE_SECRET_KEY: optional("STRIPE_SECRET_KEY"),
