@@ -47,7 +47,7 @@ export default function OpengraphImage() {
           {/* Eyebrow */}
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignSelf: "flex-start",
               padding: "8px 16px",
               borderRadius: 999,
