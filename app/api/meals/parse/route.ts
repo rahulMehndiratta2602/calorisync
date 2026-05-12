@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentSession } from "@/lib/auth";
 import { anthropic, AI_MODELS } from "@/lib/anthropic";
+import { uploadMealPhoto } from "@/lib/s3";
 import type Anthropic from "@anthropic-ai/sdk";
 
 type ContentBlockParam =
@@ -115,6 +116,7 @@ export async function POST(req: NextRequest) {
   }
 
   const userContent: ContentBlockParam[] = [];
+  let uploadedPhoto: Awaited<ReturnType<typeof uploadMealPhoto>> | null = null;
 
   if (parsed.data.mode === "photo") {
     if (!parsed.data.imageBase64 || !parsed.data.imageMimeType) {
@@ -123,6 +125,19 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // Persist the photo to S3 in parallel with the AI call (don't block parse
+    // on it but don't lose the photo either). If upload fails the meal still
+    // logs; we just won't have a stored photo.
+    const uploadPromise = uploadMealPhoto({
+      userId: sess.user.id,
+      base64: parsed.data.imageBase64,
+      mimeType: parsed.data.imageMimeType,
+    }).catch((err) => {
+      console.error("[meals/parse] photo upload failed:", err);
+      return null;
+    });
+
     userContent.push({
       type: "image",
       source: {
@@ -135,6 +150,9 @@ export async function POST(req: NextRequest) {
       type: "text",
       text: "Log this meal. Identify each visible food item and estimate portions.",
     });
+
+    // Resolve before we return so the client can include s3_key in /save.
+    uploadedPhoto = await uploadPromise;
   } else {
     if (!parsed.data.text) {
       return NextResponse.json({ error: "text mode requires text" }, { status: 400 });
@@ -194,6 +212,14 @@ export async function POST(req: NextRequest) {
       ok: true,
       parsed: result,
       totals,
+      photo: uploadedPhoto
+        ? {
+            bucket: uploadedPhoto.bucket,
+            key: uploadedPhoto.key,
+            bytes: uploadedPhoto.bytes,
+            mimeType: uploadedPhoto.mimeType,
+          }
+        : null,
       usage: {
         input_tokens: response.usage.input_tokens,
         output_tokens: response.usage.output_tokens,

@@ -42,12 +42,20 @@ interface ParseResult {
   notes?: string;
 }
 
+interface UploadedPhoto {
+  bucket: string;
+  key: string;
+  bytes: number;
+  mimeType: string;
+}
+
 export function LogMealClient() {
   const router = useRouter();
   const [tab, setTab] = React.useState<"photo" | "voice" | "text" | "manual">("photo");
   const [parsing, setParsing] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [result, setResult] = React.useState<ParseResult | null>(null);
+  const [photo, setPhoto] = React.useState<UploadedPhoto | null>(null);
   const [source, setSource] = React.useState<"photo" | "voice" | "text" | "manual">("photo");
 
   async function parse(args: {
@@ -58,6 +66,7 @@ export function LogMealClient() {
   }) {
     setParsing(true);
     setResult(null);
+    setPhoto(null);
     try {
       const res = await fetch("/api/meals/parse", {
         method: "POST",
@@ -70,6 +79,7 @@ export function LogMealClient() {
         return;
       }
       setResult(json.parsed);
+      if (json.photo) setPhoto(json.photo);
       if (json.parsed.overall_confidence >= 0.7) {
         toast.success(
           `Parsed in ${Math.round((json.usage?.output_tokens ?? 0) / 50)}s — review and save.`,
@@ -100,6 +110,7 @@ export function LogMealClient() {
           overall_confidence: result.overall_confidence,
           note: result.notes,
           ai_raw: result as unknown as Record<string, unknown>,
+          photo: photo ?? undefined,
         }),
       });
       const json = await res.json().catch(() => ({}));

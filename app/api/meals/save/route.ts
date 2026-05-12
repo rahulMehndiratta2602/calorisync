@@ -28,6 +28,16 @@ const bodySchema = z.object({
   overall_confidence: z.number().min(0).max(1),
   note: z.string().max(500).optional(),
   ai_raw: z.record(z.string(), z.unknown()).optional(),
+  photo: z
+    .object({
+      bucket: z.string().max(200),
+      key: z.string().max(500),
+      bytes: z.number().int().min(0).max(20_000_000),
+      mimeType: z.string().max(64),
+      width: z.number().int().min(0).max(20000).optional(),
+      height: z.number().int().min(0).max(20000).optional(),
+    })
+    .optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -109,6 +119,19 @@ export async function POST(req: NextRequest) {
         sortOrder: idx,
       })),
     );
+
+    if (parsed.data.photo) {
+      await tx.insert(schema.mealPhotos).values({
+        mealId: meal.id,
+        s3Key: parsed.data.photo.key,
+        bucket: parsed.data.photo.bucket,
+        bytes: parsed.data.photo.bytes,
+        mimeType: parsed.data.photo.mimeType,
+        width: parsed.data.photo.width,
+        height: parsed.data.photo.height,
+        aiParsedAt: new Date(),
+      });
+    }
   });
 
   // Audit + fire-and-forget side effects.
