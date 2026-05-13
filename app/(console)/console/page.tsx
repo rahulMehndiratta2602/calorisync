@@ -190,18 +190,26 @@ export default async function ConsoleDashboard() {
           </Link>
         </header>
         {meals.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center gap-3 p-12 text-center">
-              <p className="font-display text-lg">No meals logged yet today</p>
-              <p className="max-w-xs text-sm text-muted-foreground">
-                Snap a photo, speak a meal, or type it in — all under 5 seconds.
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-background to-background">
+            <CardContent className="flex flex-col items-center justify-center gap-3 p-10 text-center">
+              <div className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <Plus className="size-6" />
+              </div>
+              <p className="font-display text-xl">Log your first meal</p>
+              <p className="max-w-md text-sm text-muted-foreground">
+                Pick how you want to log: snap a photo, speak it, type a description, or use the quick-add
+                preset library. All four take under 5 seconds.
               </p>
-              <Button asChild className="mt-2">
-                <Link href="/console/log">
-                  <Plus className="size-4" />
-                  Log your first meal
-                </Link>
-              </Button>
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+                <Button asChild>
+                  <Link href="/console/log">
+                    <Plus className="size-4" /> Log a meal
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/console/chat">Ask the AI coach</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
