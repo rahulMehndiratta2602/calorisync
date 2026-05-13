@@ -56,9 +56,14 @@ export default async function AdminUsersPage() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="border-b border-border last:border-b-0">
+                  <tr key={u.id} className="border-b border-border last:border-b-0 hover:bg-muted/20">
                     <td className="px-4 py-3">
-                      <span className="font-medium">{u.email}</span>
+                      <a
+                        href={`/admin/users/${u.id}`}
+                        className="font-medium underline-offset-2 hover:underline"
+                      >
+                        {u.email}
+                      </a>
                       {!u.verifiedAt && (
                         <span className="ml-2 text-xs text-amber-600">unverified</span>
                       )}
