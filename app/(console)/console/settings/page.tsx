@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/navigation";
 import { DeleteAccountButton } from "./delete-account-button";
+import { ProfileEdit } from "./profile-edit";
 
 export const metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -48,7 +49,23 @@ export default async function SettingsPage() {
 
       <Card>
         <CardContent className="flex flex-col gap-3 p-6">
-          <p className="text-sm font-semibold">Profile</p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">Profile</p>
+            {profile && (
+              <ProfileEdit
+                initial={{
+                  weightKg: profile.weightKg ? String(profile.weightKg) : null,
+                  heightCm: profile.heightCm ? String(profile.heightCm) : null,
+                  dob: profile.dob,
+                  sex: profile.sex,
+                  activityLevel: profile.activityLevel,
+                  goal: profile.goal,
+                  dietStyle: profile.dietStyle,
+                  timezone: profile.timezone,
+                }}
+              />
+            )}
+          </div>
           {profile ? (
             <>
               <Row label="Weight" value={profile.weightKg ? `${profile.weightKg} kg` : "—"} />
