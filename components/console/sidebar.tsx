@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { label: "Today", href: "/console", icon: LayoutDashboard },
   { label: "Log meal", href: "/console/log", icon: Plus, highlight: true },
+  { label: "Chat coach", href: "/console/chat", icon: Sparkles },
   { label: "History", href: "/console/history", icon: History },
   { label: "Profile", href: "/console/profile", icon: User },
   { label: "Settings", href: "/console/settings", icon: Settings },
