@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { eq, desc } from "drizzle-orm";
-import { Plus } from "lucide-react";
+import { Camera, Mic, Type, Plus } from "lucide-react";
 import { getCurrentSession } from "@/lib/auth";
 import { db, schema } from "@/lib/db";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +23,7 @@ export default async function HistoryPage() {
     where: eq(schema.meals.userId, sess.user.id),
     orderBy: [desc(schema.meals.loggedAt)],
     limit: 100,
+    with: { photos: true },
   });
 
   const byDate = new Map<string, typeof meals>();
@@ -85,31 +86,41 @@ export default async function HistoryPage() {
                 </header>
                 <Card>
                   <ul className="divide-y divide-border">
-                    {ms.map((m) => (
-                      <li key={m.id}>
-                        <Link
-                          href={`/console/meals/${m.id}`}
-                          className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-muted/30"
-                        >
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium">
-                              {m.aiSummary || `${m.mealType} meal`}
-                            </p>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              {new Date(m.loggedAt).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                timeZone: tz,
-                              })}{" "}
-                              · {m.mealType} · {m.source}
-                            </p>
-                          </div>
-                          <span className="ml-3 text-sm font-semibold tabular-nums">
-                            {Math.round(Number(m.totalKcal))} kcal
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
+                    {ms.map((m) => {
+                      const hasPhoto = m.photos && m.photos.length > 0;
+                      return (
+                        <li key={m.id}>
+                          <Link
+                            href={`/console/meals/${m.id}`}
+                            className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/30"
+                          >
+                            <MealThumb
+                              hasPhoto={hasPhoto}
+                              mealId={m.id}
+                              source={m.source}
+                              mealType={m.mealType}
+                              summary={m.aiSummary}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium">
+                                {m.aiSummary || `${m.mealType} meal`}
+                              </p>
+                              <p className="text-xs text-muted-foreground capitalize">
+                                {new Date(m.loggedAt).toLocaleTimeString("en-US", {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                  timeZone: tz,
+                                })}{" "}
+                                · {m.mealType} · {sourceLabel(m.source)}
+                              </p>
+                            </div>
+                            <span className="ml-3 shrink-0 text-sm font-semibold tabular-nums">
+                              {Math.round(Number(m.totalKcal))} kcal
+                            </span>
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </Card>
               </section>
@@ -117,6 +128,61 @@ export default async function HistoryPage() {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+function sourceLabel(s: string): string {
+  if (s === "photo") return "📸 Photo";
+  if (s === "voice") return "🎙 Voice";
+  if (s === "text") return "Typed";
+  if (s === "manual") return "Quick-add";
+  return s;
+}
+
+// Thumbnail: real photo if available, else a colored tile based on meal type.
+function MealThumb({
+  hasPhoto,
+  mealId,
+  source,
+  mealType,
+  summary,
+}: {
+  hasPhoto: boolean;
+  mealId: string;
+  source: string;
+  mealType: string;
+  summary: string | null;
+}) {
+  if (hasPhoto) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={`/api/meals/photo/${mealId}`}
+        alt={summary || mealType}
+        loading="lazy"
+        className="size-14 shrink-0 rounded-xl object-cover ring-1 ring-border"
+      />
+    );
+  }
+  // Tinted tile + icon to match the entry source
+  const Icon = source === "voice" ? Mic : source === "text" ? Type : source === "manual" ? Plus : Camera;
+  const tint =
+    mealType === "breakfast"
+      ? "from-amber-400/20 to-orange-400/20 text-amber-700 dark:text-amber-300"
+      : mealType === "lunch"
+        ? "from-emerald-400/20 to-teal-400/20 text-emerald-700 dark:text-emerald-300"
+        : mealType === "dinner"
+          ? "from-fuchsia-400/20 to-rose-400/20 text-rose-700 dark:text-rose-300"
+          : mealType === "snack"
+            ? "from-sky-400/20 to-blue-400/20 text-sky-700 dark:text-sky-300"
+            : "from-muted to-muted text-muted-foreground";
+  return (
+    <div
+      aria-hidden
+      className={`grid size-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br ${tint} ring-1 ring-border`}
+    >
+      <Icon className="size-5" />
     </div>
   );
 }
