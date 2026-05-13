@@ -86,23 +86,28 @@ export default async function HistoryPage() {
                 <Card>
                   <ul className="divide-y divide-border">
                     {ms.map((m) => (
-                      <li key={m.id} className="flex items-center justify-between px-5 py-3.5">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium">
-                            {m.aiSummary || `${m.mealType} meal`}
-                          </p>
-                          <p className="text-xs text-muted-foreground capitalize">
-                            {new Date(m.loggedAt).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              timeZone: tz,
-                            })}{" "}
-                            · {m.mealType} · {m.source}
-                          </p>
-                        </div>
-                        <span className="ml-3 text-sm font-semibold tabular-nums">
-                          {Math.round(Number(m.totalKcal))} kcal
-                        </span>
+                      <li key={m.id}>
+                        <Link
+                          href={`/console/meals/${m.id}`}
+                          className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-muted/30"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium">
+                              {m.aiSummary || `${m.mealType} meal`}
+                            </p>
+                            <p className="text-xs text-muted-foreground capitalize">
+                              {new Date(m.loggedAt).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                timeZone: tz,
+                              })}{" "}
+                              · {m.mealType} · {m.source}
+                            </p>
+                          </div>
+                          <span className="ml-3 text-sm font-semibold tabular-nums">
+                            {Math.round(Number(m.totalKcal))} kcal
+                          </span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
