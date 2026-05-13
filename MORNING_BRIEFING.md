@@ -1,92 +1,122 @@
 # Calorisync — Morning Briefing
 
-Good morning. Site is live at **[https://calorisync.com](https://calorisync.com)** 🟢
+Site is live at **[https://calorisync.com](https://calorisync.com)** 🟢
 
-I kept building after the first checkpoint. Lots of new things to test.
+I kept building through the night. This is the comprehensive briefing.
 
-## What's new since the first briefing
+## TL;DR — what to test in 5 minutes
 
-| Feature | Where | Status |
-|---|---|---|
-| **Demo mode** (no signup needed) | [/demo](https://calorisync.com/demo) | ✅ Full dashboard preview with realistic data |
-| **Admin dashboard** (gated to admin emails) | /admin/* | ✅ 6 sub-pages: overview, users, newsletter, email-events, audit-log, feature-flags |
-| **CSV exports** | /api/meals/export, /api/admin/newsletter/export | ✅ Live |
-| **Audit log** | wired into signin/verify/save/newsletter | ✅ Every consequential action recorded |
-| **Quick-add food + autocomplete** | /console/log Quick add tab | ✅ 45 foods, type-ahead, auto-fill macros |
-| **AWS S3 photo persistence** | calorisync-meal-photos-ap-south-1 + IAM role | ✅ Photos uploaded on parse; meal_photos rows on save |
-| **Custom 404 page** | any unknown URL | ✅ Branded, with helpful links |
-| **PWA manifest + icon** | /manifest.webmanifest, /icon.svg | ✅ 'Add to home screen' works |
-| **Account deletion** | settings → danger zone | ✅ Typed-confirmation modal |
-| **Dynamic OG image** | /opengraph-image | ✅ 1200×630 PNG generated per request (Satori) |
-| **Streak counter + weekly chart** | /console dashboard | ✅ TZ-aware via Postgres `AT TIME ZONE` |
-| **Daily summary cron** | /api/cron/daily-summary + systemd timer | ✅ Runs nightly at 03:30 UTC |
-| **Legal pages** | /privacy, /terms, /about, /help, /security, /contact, /changelog, /features, /pricing | ✅ All real content, no 404s |
+1. **Landing page** → https://calorisync.com — full marketing site with motion
+2. **Demo** → https://calorisync.com/demo — try the dashboard without signing up
+3. **Newsletter signup** → submit any email on the homepage, it goes into Neon
+4. **OG image** → https://calorisync.com/opengraph-image — dynamic 1200×630 PNG
+5. **404** → https://calorisync.com/nope — custom branded not-found page
+6. **Sign in** → submit your email on /signin → grab the magic link from journalctl (instructions below) → see /console
+7. **Admin dashboard** → after signing in with `mandyratta@gmail.com`, hit /admin
 
-## Live URLs to test
+## Everything that's live (20 routes + 9 APIs)
 
-```
-https://calorisync.com/                # landing
-https://calorisync.com/demo            # ← play with the dashboard, no signup
-https://calorisync.com/features        # dedicated features page
-https://calorisync.com/pricing         # dedicated pricing
-https://calorisync.com/help            # FAQ
-https://calorisync.com/security        # security practices
-https://calorisync.com/changelog       # release log
-https://calorisync.com/opengraph-image # OG image (preview before sharing)
-https://calorisync.com/sitemap.xml     # SEO sitemap
-https://calorisync.com/robots.txt      # SEO robots
-https://calorisync.com/signin          # magic-link sign-in
-https://calorisync.com/manifest.webmanifest  # PWA manifest
-```
+### Public pages (no auth)
+- `/` — landing
+- `/demo` — interactive dashboard preview with fake data
+- `/features` — dedicated features page
+- `/pricing` — dedicated pricing page
+- `/about` — backstory, principles
+- `/help` — FAQ accordion
+- `/security` — practices + responsible disclosure
+- `/contact` — email cards
+- `/changelog` — release log
+- `/blog` — "Coming soon"
+- `/api-docs` — API teaser
+- `/integrations` — Apple Health/Garmin/Strava/Sheets roadmap
+- `/privacy`, `/terms` — legal
+- `/signin`, `/signup`, `/auth/verify`
 
-## Sign in to see admin + console
+### Console (auth-gated)
+- `/console` — today's macros + streak + weekly chart + recent meals
+- `/console/onboarding` — 4-step setup
+- `/console/log` — photo / voice / text / quick-add tabs (45 preset foods)
+- `/console/chat` — **AI coach** powered by Claude with your macro context
+- `/console/history` — meals grouped by day
+- `/console/profile`, `/console/settings` — profile readout + CSV export + danger zone
 
-The magic-link email isn't actually sent (Mailpanzer not built yet — that's what
-*you* are building, right?). To grab the link, after submitting the signin form:
+### Admin (admin email gated)
+- `/admin` — counts + recent activity
+- `/admin/insights` — verify/onboard rates, diet/goal/source breakdowns, 14-day volume
+- `/admin/users` — full list with drill-down
+- `/admin/users/[id]` — single user: profile, sessions, meals, audit trail
+- `/admin/newsletter` — subscribers with source/UTM + CSV export
+- `/admin/email-events` — transactional log (Mailpanzer queue)
+- `/admin/audit-log` — actor/action trail
+- `/admin/feature-flags` — flag toggles + rollout %
+
+### APIs
+- `POST /api/newsletter` — idempotent newsletter subscribe
+- `POST /api/auth/signin` — request magic link
+- `GET /api/auth/verify` — consume magic link, create session
+- `POST /api/auth/signout` — revoke session
+- `POST /api/profile/onboard` — save onboarding form
+- `POST /api/meals/parse` — AI parse + S3 photo upload
+- `POST /api/meals/save` — persist meal + entries + photo metadata
+- `GET /api/meals/export` — full meal CSV download
+- `POST /api/chat` — AI coach with prompt cache
+- `POST /api/account/delete` — soft-delete + revoke sessions
+- `POST /api/cron/daily-summary` — nightly aggregate (systemd timer)
+- `GET /api/admin/newsletter/export` — admin CSV
+- `POST /api/webhooks/mailpanzer` — HMAC-verified delivery callbacks
+- `/robots.txt`, `/sitemap.xml`, `/opengraph-image`, `/manifest.webmanifest`, `/icon.svg`
+
+## How to sign in (no real email sender wired)
 
 ```bash
+# 1. Submit your email on /signin
+# 2. Grab the magic link
 ssh -i D:\calorisync\.claude\calorisync-deploy.pem ec2-user@65.0.54.134 \
   'sudo journalctl -u calorisync -n 30 --no-pager | grep "magic-link for" | tail -1'
+# 3. Open the URL — you'll land in /console/onboarding
 ```
 
-Open the URL it prints in any browser. You'll be at /console/onboarding, then
-/console with full dashboard.
+After onboarding, hit `/console` (dashboard), `/console/log` (try the AI photo
+parse — it actually saves the photo to S3 via your EC2 IAM role), and
+`/console/chat` (chat with Claude about your macros, prompt-cached per
+CLAUDE.md spec).
 
-**Admin access**: since `ADMIN_EMAILS=mandyratta@gmail.com`, signing in with
-your usual email shows the "Open admin dashboard" button in Settings.
-
-## Infrastructure overview
+## Infrastructure (all tagged Project=calorisync, ManagedBy=claude-autonomous-build)
 
 ### AWS account `514348993251`, region `ap-south-1`
 
-- **EC2**: `i-04eef4382fdf79611` (t3.small) at `65.0.54.134`
-  - Stack: Caddy v2.11.2 → Next.js standalone via systemd `calorisync.service`
-  - IAM role `calorisync-ec2-app` attached (S3 PutObject/GetObject on the photos bucket)
+- **EC2** `i-04eef4382fdf79611` (t3.small) at `65.0.54.134`
+  - Caddy v2.11.2 (port 80 + 443 with `tls internal`) → Next.js standalone → 3000
+  - IAM role `calorisync-ec2-app` (S3 perms scoped to photo bucket)
   - systemd timer `calorisync-daily-summary.timer` fires at 03:30 UTC nightly
 - **S3 bucket** `calorisync-meal-photos-ap-south-1`
-  - Private (block-all-public), versioned, encrypted (SSE-AES256)
-  - CORS for calorisync.com origins, lifecycle rules (abort orphan multipart after 1d)
-  - Tagged Project=calorisync, Env=prod, Service=meal-photos
+  - Private, versioned, SSE-AES256, CORS for calorisync.com origins
+  - Lifecycle: abort orphan multiparts after 1d, expire `trash/` after 30d
 - **Security group** `sg-056ceebd3ac0cb5a9`
-  - 22 from `223.185.55.177/32` (your IP — update if you've moved)
-  - 80, 443 from `0.0.0.0/0`
-- **SSH key**: `D:\calorisync\.claude\calorisync-deploy.pem`
+  - SSH from `223.185.57.190/32` (my current IP)
+  - 80/443 from `0.0.0.0/0`
+- **SSH key** at `D:\calorisync\.claude\calorisync-deploy.pem`
 
 ### Cloudflare DNS, zone `d432a137a6f126e199807b6efadce28e`
 
-- `A calorisync.com → 65.0.54.134` (proxied)
+- `A calorisync.com → 65.0.54.134` (proxied, free TLS)
 - `A www.calorisync.com → 65.0.54.134` (proxied)
-- Mail records (DKIM, SPF, DMARC) untouched
+- Mail records (DKIM `mp1778609595._domainkey`, SPF, DMARC) untouched
 
 ### Neon Postgres (ap-southeast-1)
 
-- 15 tables, schema applied
-- Pooled + direct URLs in [.claude/secrets.env](.claude/secrets.env)
+- 15 tables applied via drizzle-kit push
+- Pooled + direct URLs in `D:\calorisync\.claude\secrets.env`
 
-## Recent commits this session
+## Commits this session (15 total)
 
 ```
-dee7d49  Fix OG image: use display:flex (Satori doesn't support inline-flex)
+3cf3929  Admin user detail page + drill-down from user list
+a75ef0c  Add /console/chat — AI coach powered by Claude with macro context
+b6b30ea  Add /admin/insights — platform-level aggregate stats
+5aab6bf  Stub /blog, /api-docs, /integrations to remove last footer 404s
+c083329  Mailpanzer email adapter + webhook receiver
+c19c73d  Refresh MORNING_BRIEFING with all features added since the first checkpoint
 2b5ab66  Daily-summary cron + admin feature flags page + dynamic OG image
 9ef624d  Add quick-foods library + autocomplete in Quick-add tab
 a7d6be0  Custom 404 page + PWA manifest + sitemap completeness + account deletion
@@ -100,44 +130,48 @@ abdbf2d  Add /demo public route for no-signup product preview
 1679e75  Build landing page, console scaffolding, auth flow, DB schema
 ```
 
-12 commits. ~7 hours of autonomous work.
+## Cost (running monthly)
 
-## Cost estimate (running monthly)
-
-| Item | Free tier | After free tier |
+| | First 12 mo | After |
 |---|---|---|
-| EC2 t3.small ap-south-1 | $0 (12-mo free for new accts) | ~$17/mo |
-| EBS 15GB gp3 | $0 (within 30GB free) | ~$1.50/mo |
-| S3 calorisync-meal-photos | $0 (under 5GB) | $0.023/GB |
-| Cloudflare proxy + TLS | $0 forever | $0 |
+| EC2 t3.small | $0 | ~$17/mo |
+| EBS 15GB | $0 | ~$1.50/mo |
+| S3 photos | $0 (under 5GB) | $0.023/GB |
+| Cloudflare | $0 | $0 |
 | Neon free tier | $0 | $0 (autopauses) |
-| Anthropic API (per token) | n/a | varies |
-| **Estimated steady-state** | **$0** | **~$20–30/mo** |
+| Anthropic API | per-token | varies |
+| **Steady state** | **$0** | **~$20-30/mo** |
 
-## What I'd build next
+The chat assistant uses prompt-cache breakpoints, so multi-turn chats cost ~10% of uncached.
 
-In priority order, if you give me more time:
+## Mailpanzer integration (your actual product)
 
-1. **Wire Mailpanzer SMTP/API** into the email adapter — replace stub
-2. **Photo display** in the meal-detail view (currently uploads but isn't shown back)
-3. **Recipes & meal templates** — save common meals as one-click logs
-4. **Weekly digest email** preview in admin (using daily_summary data)
-5. **Apple Health / Strava integrations**
-6. **More AI features**: chat assistant for diet questions; recipe-from-photo
-7. **Internationalization** — units toggle (kg/lbs, cm/in)
-8. **Mobile-first onboarding tweaks** — currently desktop-optimized
+When Mailpanzer is ready to send for Calorisync:
 
-## Security cleanups to do today
+```
+# In D:\calorisync\.claude\secrets.env:
+EMAIL_PROVIDER=mailpanzer
+MAILPANZER_API_URL=https://api.mailpanzer.com/v1/send  # or whatever
+MAILPANZER_API_KEY=...
+MAILPANZER_WEBHOOK_SECRET=...
+```
 
-⚠️ **Rotate these because they're in the transcript:**
+Then redeploy. Every transactional event already writes to `email_events`,
+and the Mailpanzer adapter will pick them up. Mailpanzer can POST delivery
+status back to `https://calorisync.com/api/webhooks/mailpanzer` with HMAC-SHA256
+auth, and the email_events row will update to `delivered` / `bounced` / `failed`.
 
-1. Anthropic API key (sk-ant-api03-…) → https://console.anthropic.com/
-2. AWS access key (`AKIA…`) → IAM Console
+## Security cleanups (transcript exposure)
+
+⚠️ Rotate these:
+
+1. Anthropic API key → https://console.anthropic.com/
+2. AWS access key (`AKIA…`) → IAM
 3. Neon DB password → Neon dashboard
-4. Cloudflare API token (`cfat_j6E…`) → Cloudflare API tokens
-5. CRON_SECRET (generated locally, never sent over chat) — no rotation needed
+4. Cloudflare API token (`cfat_j6E…`) → CF API tokens
 
-After rotating, regenerate `.env.local` from `secrets.env` and redeploy.
+CRON_SECRET, AUTH_SECRET, MAILPANZER_WEBHOOK_SECRET were generated locally —
+no need to rotate.
 
 ## Redeploy recipe
 
@@ -156,15 +190,8 @@ scp -i D:\calorisync\.claude\calorisync-deploy.pem calorisync-deploy.tar.gz ec2-
 ssh -i D:\calorisync\.claude\calorisync-deploy.pem ec2-user@65.0.54.134 'sudo systemctl stop calorisync && sudo rm -rf /opt/calorisync/app && sudo mkdir -p /opt/calorisync/app && sudo tar -xzf /tmp/calorisync-deploy.tar.gz -C /opt/calorisync/app && sudo chown -R calorisync:calorisync /opt/calorisync && sudo chmod 600 /opt/calorisync/app/.env.local && sudo systemctl restart calorisync'
 ```
 
-## Path map
+PR ready: https://github.com/rahulMehndiratta2602/calorisync/pull/new/claude/condescending-grothendieck-dc9f73
 
-- Worktree: `D:\calorisync\.claude\worktrees\condescending-grothendieck-dc9f73`
-- Secrets: `D:\calorisync\.claude\secrets.env`
-- SSH key: `D:\calorisync\.claude\calorisync-deploy.pem`
-- EC2 state: `D:\calorisync\.claude\ec2-state.json`
-- CA bundle: `C:\Users\my\.aws\ca-bundle.pem`
-- Progress log: `D:\calorisync\.claude\progress.md`
-- Branch: `claude/condescending-grothendieck-dc9f73`
-- PR ready: https://github.com/rahulMehndiratta2602/calorisync/pull/new/claude/condescending-grothendieck-dc9f73
+Branch: `claude/condescending-grothendieck-dc9f73`
 
-Wake me up if you need anything — there's still budget for fixes.
+Still budget for more — wake me up if you want anything tweaked or added.
