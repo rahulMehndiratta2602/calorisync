@@ -243,7 +243,9 @@
       "Product": [
         { "label": "Features", "href": "/features" },
         { "label": "Pricing", "href": "/pricing" },
-        { "label": "Changelog", "href": "/changelog" }
+        { "label": "Demo", "href": "/demo" },
+        { "label": "Changelog", "href": "/changelog" },
+        { "label": "Status", "href": "/status" }
       ],
       "Company": [
         { "label": "About", "href": "/about" },
