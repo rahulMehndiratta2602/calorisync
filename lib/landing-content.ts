@@ -17,7 +17,6 @@ export interface LandingContent {
     subheadline: string;
     cta_primary: string;
     cta_secondary: string;
-    social_proof_microcopy: string;
     trust_signals: string[];
   };
   feature_strip: {
@@ -32,11 +31,6 @@ export interface LandingContent {
     bullet_points: string[];
     demo_caption: string;
   }[];
-  comparison_table: {
-    title: string;
-    columns: string[];
-    rows: { feature: string; values: string[] }[];
-  };
   how_it_works: {
     step_number: number;
     title: string;
@@ -59,12 +53,6 @@ export interface LandingContent {
     free_plan_note: string;
     trial_note: string;
   };
-  testimonials: {
-    quote: string;
-    name: string;
-    title: string;
-    avatar_seed: string;
-  }[];
   faq: { question: string; answer: string }[];
   final_cta: {
     headline: string;

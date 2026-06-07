@@ -16,9 +16,9 @@ export default function AboutPage() {
       </h1>
 
       <p className="text-lg text-muted-foreground">
-        Calorisync exists because every existing calorie tracker felt like a chore. We measured —
-        15 minutes a day in MyFitnessPal, more if you're conscientious about portions. That's 90+
-        hours a year you'd never get back.
+        Calorisync exists because every existing calorie tracker felt like a chore. Logging a day's
+        meals with traditional trackers can eat 10–15 minutes if you're conscientious about
+        portions. That's dozens of hours a year you'd never get back.
       </p>
 
       <p>
@@ -29,10 +29,10 @@ export default function AboutPage() {
 
       <h2 className="mt-10 text-xl font-semibold">Web-first, on purpose</h2>
       <p>
-        Cal AI and the others went mobile-app-first. We went web-first because every device — your
-        laptop, your phone browser, even the iPad on your kitchen counter — should be able to log a
-        meal in the same flow. No App Store review timelines. No 30% revenue cut on subscriptions.
-        Just a URL that works.
+        Most modern calorie trackers went mobile-app-first. We went web-first because every device
+        — your laptop, your phone browser, even the iPad on your kitchen counter — should be able to
+        log a meal in the same flow. No App Store review timelines. No 30% revenue cut on
+        subscriptions. Just a URL that works.
       </p>
 
       <h2 className="mt-10 text-xl font-semibold">What we won't do</h2>

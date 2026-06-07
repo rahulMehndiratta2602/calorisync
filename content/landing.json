@@ -29,7 +29,6 @@
     "subheadline": "Snap a plate or speak naturally. AI handles the rest. Faster than every calorie tracker on the market.",
     "cta_primary": "Start free",
     "cta_secondary": "Watch demo",
-    "social_proof_microcopy": "Loved by 2,300+ early users",
     "trust_signals": [
       "No credit card for trial",
       "Cancel anytime",
@@ -93,19 +92,6 @@
       "demo_caption": "User profile shows current macros with sliders, selects 'High-protein', targets refresh instantly, day view shows progress bars for each macro"
     }
   ],
-  "comparison_table": {
-    "title": "Why people switch to Calorisync",
-    "columns": ["Calorisync", "Cal AI", "MyFitnessPal", "Manual tracking"],
-    "rows": [
-      { "feature": "Photo logging", "values": ["Yes", "Yes", "Partial", "No"] },
-      { "feature": "Voice logging", "values": ["Yes", "No", "No", "No"] },
-      { "feature": "Works in browser", "values": ["Yes", "Mobile only", "Yes", "Yes"] },
-      { "feature": "No app install", "values": ["Yes", "No", "No", "Yes"] },
-      { "feature": "Custom macro splits", "values": ["Yes", "Basic", "Yes", "Yes"] },
-      { "feature": "Ad-free", "values": ["Yes", "Yes", "Paid only", "Yes"] },
-      { "feature": "Data export", "values": ["Yes", "No", "Partial", "Yes"] }
-    ]
-  },
   "how_it_works": [
     {
       "step_number": 1,
@@ -167,32 +153,6 @@
     "free_plan_note": "Upgrade to Pro anytime during your 14-day trial or stay on the free tier. Free users keep read-only access to all past meals and can log manually without AI parsing.",
     "trial_note": "Your 14-day trial of Pro starts immediately. No credit card required. Cancel anytime before the trial ends and you won't be charged."
   },
-  "testimonials": [
-    {
-      "quote": "I was logging in MyFitnessPal for 15 minutes every day. Calorisync cut that to 30 seconds per meal. Finally tracking macros consistently.",
-      "name": "Sarah Chen",
-      "title": "Fitness coach, Singapore",
-      "avatar_seed": "marathon"
-    },
-    {
-      "quote": "Voice logging while cooking saved my streak. Snapped photos of ingredients and was done before plating.",
-      "name": "Marcus L.",
-      "title": "Software engineer, Austin",
-      "avatar_seed": "chef"
-    },
-    {
-      "quote": "As a lifter, I need protein targets precise to the gram. The macro recalculation when my weight changed was instant and right.",
-      "name": "Priya Sharma",
-      "title": "Powerlifter, Bengaluru",
-      "avatar_seed": "lifter"
-    },
-    {
-      "quote": "No app, no ads, no dark patterns. It's just a tracker that works and stays out of the way.",
-      "name": "James W.",
-      "title": "Product manager, London",
-      "avatar_seed": "minimalist"
-    }
-  ],
   "faq": [
     {
       "question": "How accurate is the AI photo parsing?",
@@ -233,7 +193,7 @@
   ],
   "final_cta": {
     "headline": "Stop logging. Start tracking what actually matters.",
-    "subheadline": "Join 2,300+ people who ditched the tedium and kept the insights.",
+    "subheadline": "Ditch the tedium. Keep the insights.",
     "cta_primary": "Start your free trial",
     "microcopy": "14 days free, no card required. Cancel anytime."
   },
@@ -294,11 +254,6 @@
         "priceValidUntil": "2026-12-31",
         "description": "Pro annual"
       }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.7",
-      "ratingCount": "247"
-    }
+    ]
   }
 }

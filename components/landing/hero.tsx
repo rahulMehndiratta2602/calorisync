@@ -84,7 +84,6 @@ export function HeroSection() {
               Try the demo
             </Link>
           </Button>
-          <span className="text-xs text-muted-foreground">{h.social_proof_microcopy}</span>
         </motion.div>
 
         {/* Mock product preview */}
